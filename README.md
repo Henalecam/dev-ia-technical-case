@@ -12,7 +12,6 @@ npm install
 
 # 2. Configurar .env
 cp .env.example .env
-# Adicione suas credenciais
 
 # 3. Executar
 npm run dev
