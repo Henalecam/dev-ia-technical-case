@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'To-Do List com IA',
-  description: 'Sistema de tarefas integrado com chatbot IA',
+  title: 'TaskFlow AI - Sistema Inteligente de Tarefas',
+  description: 'Gerencie suas tarefas com inteligência artificial, integração WhatsApp e chatbot avançado',
 }
 
 export default function RootLayout({
@@ -13,7 +13,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className="bg-gray-50">{children}</body>
+      <body className="bg-gray-50 min-h-screen">
+        {children}
+      </body>
     </html>
   )
 }

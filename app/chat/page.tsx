@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
+import Navbar from '@/components/Navbar'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -121,10 +122,12 @@ export default function ChatPage() {
   }
 
   const quickActions = [
-    { label: 'Minhas tarefas pendentes', icon: '📋' },
-    { label: 'Tarefas de alta prioridade', icon: '🔴' },
-    { label: 'Tarefas para hoje', icon: '📅' },
-    { label: 'Resumo das minhas tarefas', icon: '📊' },
+    { label: 'Minhas tarefas pendentes', icon: '📋', description: 'Ver todas as tarefas não concluídas' },
+    { label: 'Tarefas de alta prioridade', icon: '🔴', description: 'Tarefas urgentes que precisam de atenção' },
+    { label: 'Tarefas para hoje', icon: '📅', description: 'Tarefas com prazo para hoje' },
+    { label: 'Resumo das minhas tarefas', icon: '📊', description: 'Estatísticas e análise geral' },
+    { label: 'Criar nova tarefa', icon: '➕', description: 'Adicionar uma nova tarefa à lista' },
+    { label: 'Dicas de produtividade', icon: '💡', description: 'Sugestões para ser mais produtivo' },
   ]
 
   const handleQuickAction = (label: string) => {
@@ -175,8 +178,10 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-      <div className="max-w-6xl mx-auto p-4 h-screen flex flex-col">
-        {/* Header */}
+      <Navbar userKey={userKey} onLogout={handleLogout} currentPage="chat" />
+      
+      <div className="max-w-6xl mx-auto p-4 h-[calc(100vh-4rem)] flex flex-col">
+        {/* Chat Header */}
         <div className="bg-white rounded-t-2xl shadow-xl p-6 border border-gray-100">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div className="flex items-center gap-4">
@@ -199,20 +204,7 @@ export default function ChatPage() {
                 className="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-xl hover:bg-yellow-200 transition-all text-sm font-medium border border-yellow-300 flex items-center gap-2"
               >
                 <span>🗑️</span>
-                Limpar
-              </button>
-              <a
-                href="/"
-                className="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl hover:bg-blue-200 transition-all text-sm font-medium border border-blue-300 flex items-center gap-2"
-              >
-                <span>📋</span>
-                Tarefas
-              </a>
-              <button
-                onClick={handleLogout}
-                className="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-200 transition-all text-sm font-medium"
-              >
-                Sair
+                Limpar Chat
               </button>
             </div>
           </div>
@@ -304,16 +296,22 @@ export default function ChatPage() {
         {/* Quick Actions */}
         {messages.length <= 1 && (
           <div className="bg-white shadow-xl px-6 py-4 border-t border-gray-200">
-            <p className="text-xs text-gray-500 mb-3 font-medium">Ações Rápidas:</p>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+            <p className="text-sm text-gray-600 mb-4 font-medium flex items-center gap-2">
+              <span>⚡</span>
+              Ações Rápidas
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {quickActions.map((action, idx) => (
                 <button
                   key={idx}
                   onClick={() => handleQuickAction(action.label)}
-                  className="bg-gradient-to-br from-gray-50 to-gray-100 hover:from-indigo-50 hover:to-purple-50 border border-gray-200 hover:border-indigo-300 text-gray-700 hover:text-indigo-700 px-3 py-2 rounded-xl transition-all text-xs font-medium flex items-center gap-2 justify-center"
+                  className="bg-gradient-to-br from-gray-50 to-gray-100 hover:from-indigo-50 hover:to-purple-50 border border-gray-200 hover:border-indigo-300 text-gray-700 hover:text-indigo-700 px-4 py-3 rounded-xl transition-all text-sm font-medium flex items-start gap-3 text-left group"
                 >
-                  <span>{action.icon}</span>
-                  <span className="hidden lg:inline">{action.label}</span>
+                  <span className="text-lg group-hover:scale-110 transition-transform">{action.icon}</span>
+                  <div>
+                    <div className="font-medium">{action.label}</div>
+                    <div className="text-xs text-gray-500 mt-1">{action.description}</div>
+                  </div>
                 </button>
               ))}
             </div>
@@ -323,40 +321,59 @@ export default function ChatPage() {
         {/* Input */}
         <div className="bg-white rounded-b-2xl shadow-xl p-6 border border-gray-100 border-t-0">
           <div className="flex gap-3">
-            <input
-              type="text"
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && !loading && sendMessage()}
-              placeholder={loading ? "Aguarde a resposta da IA..." : "Digite sua mensagem..."}
-              disabled={loading}
-              className="flex-1 px-6 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
-            />
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && !loading && sendMessage()}
+                placeholder={loading ? "Aguarde a resposta da IA..." : "Digite sua mensagem ou pergunta..."}
+                disabled={loading}
+                className="w-full px-6 py-4 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
+              />
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <span className="text-gray-400 text-sm">💬</span>
+              </div>
+            </div>
             <button
               onClick={sendMessage}
               disabled={loading || !inputMessage.trim()}
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all font-medium shadow-lg hover:shadow-xl disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transform hover:-translate-y-0.5 disabled:transform-none min-w-[100px]"
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all font-medium shadow-lg hover:shadow-xl disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transform hover:-translate-y-0.5 disabled:transform-none min-w-[120px] flex items-center justify-center gap-2"
             >
               {loading ? (
-                <span className="flex items-center gap-2">
+                <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   <span className="hidden sm:inline">Pensando...</span>
-                </span>
+                </>
               ) : (
-                <span>Enviar</span>
+                <>
+                  <span>Enviar</span>
+                  <span className="text-lg">🚀</span>
+                </>
               )}
             </button>
           </div>
-          <p className="text-xs text-gray-400 mt-3 text-center">
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <div className="w-3 h-3 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
-                <span>Aguarde a resposta da IA antes de enviar outra mensagem</span>
+          <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-1">
+                <span>💡</span>
+                <span>Dica: Use ações rápidas para começar</span>
               </span>
-            ) : (
-              "💡 O assistente pode consultar e gerenciar suas tarefas em tempo real"
-            )}
-          </p>
+            </div>
+            <div className="flex items-center gap-2">
+              {loading ? (
+                <span className="flex items-center gap-2 text-indigo-600">
+                  <div className="w-3 h-3 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
+                  <span>IA processando...</span>
+                </span>
+              ) : (
+                <span className="text-green-600 flex items-center gap-1">
+                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                  <span>Pronto para conversar</span>
+                </span>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
