@@ -95,18 +95,23 @@ export async function POST(request: NextRequest) {
     let userEmail = user_key;
     
     try {
-      const replyMatch = response.data.match(/"reply":\s*"([\s\S]*?)",\s*"user_email"/);
-      if (replyMatch) {
-        rawReply = replyMatch[1].replace(/\\n/g, '\n');
-      }
-      
-      const emailMatch = response.data.match(/"user_email":\s*"([^"]+)"/);
-      if (emailMatch) {
-        userEmail = emailMatch[1];
+      if (response.data && typeof response.data === 'object') {
+        rawReply = response.data.reply || response.data.message || 'Resposta recebida';
+        userEmail = response.data.user_email || user_key;
+      } else if (typeof response.data === 'string') {
+        const replyMatch = response.data.match(/"reply":\s*"([\s\S]*?)",\s*"user_email"/);
+        if (replyMatch) {
+          rawReply = replyMatch[1].replace(/\\n/g, '\n');
+        }
+        
+        const emailMatch = response.data.match(/"user_email":\s*"([^"]+)"/);
+        if (emailMatch) {
+          userEmail = emailMatch[1];
+        }
       }
     } catch (error) {
       console.error('Erro ao extrair dados do N8N:', error);
-      rawReply = response.data || 'Resposta recebida';
+      rawReply = 'Erro ao processar resposta';
     }
     
     console.log('Raw reply from N8N:', rawReply);
