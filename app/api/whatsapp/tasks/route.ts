@@ -9,9 +9,10 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const remoteJid = request.nextUrl.searchParams.get('remoteJid');
+    const body = await request.json();
+    const remoteJid = body.remoteJid;
     
     if (!remoteJid) {
       return NextResponse.json(
