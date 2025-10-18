@@ -108,6 +108,15 @@ export default function TasksPage() {
     window.open(url, '_blank')
   }
 
+  const handleLogin = () => {
+    if (userKey.trim()) {
+      localStorage.setItem('userKey', userKey)
+      setIsLoggedIn(true)
+      loadTasks(userKey)
+      loadWhatsAppNumber(userKey)
+    }
+  }
+
   const handleLogout = () => {
     if (confirm('Tem certeza que deseja sair?')) {
       localStorage.removeItem('userKey')
