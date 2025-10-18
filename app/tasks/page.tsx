@@ -497,7 +497,7 @@ export default function TasksPage() {
                 )}
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-4">
                   <p className="text-sm text-blue-800">
-                    📱 <strong>Exemplo:</strong> (42) 99818-8268
+                    📱 <strong>Exemplo:</strong> (42) 91234-5678
                   </p>
                   <p className="text-xs text-blue-600 mt-1">
                     Digite apenas números, a máscara será aplicada automaticamente
