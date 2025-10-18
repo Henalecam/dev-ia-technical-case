@@ -30,35 +30,28 @@ export async function POST(request: NextRequest) {
     
     cleanNumber = cleanNumber.replace(/\D/g, '');
 
-    console.log('=== DEBUG WHATSAPP TASKS ===');
-    console.log('RemoteJid original:', remoteJid);
-    console.log('Phone number extraído:', phoneNumber);
-    console.log('Clean number final:', cleanNumber);
-    console.log('Tamanho do número:', cleanNumber.length);
-    console.log('============================');
-
-    // Tenta buscar o usuário com o número exato
-    console.log('1. Buscando número exato:', cleanNumber);
+    // Primeiro tenta com o 9 adicional no lugar correto (formato mais comum no banco)
+    // Se o número tem 10 dígitos, adiciona o 9 após o DDD (42)
+    let numberWith9 = cleanNumber;
+    if (cleanNumber.length === 10 && cleanNumber.startsWith('42')) {
+      numberWith9 = cleanNumber.substring(0, 2) + '9' + cleanNumber.substring(2);
+    } else if (cleanNumber.length < 11) {
+      numberWith9 = '9' + cleanNumber;
+    }
+    
     let { data: user, error: userError } = await supabase
       .from('users')
       .select('*')
-      .eq('whatsapp_number', cleanNumber)
+      .eq('whatsapp_number', numberWith9)
       .single();
 
-    console.log('Resultado busca exata:', { user: !!user, error: userError?.message });
-
-    // Se não encontrou e o número tem 12 dígitos (com 9), tenta sem o 9
-    if (userError && cleanNumber.length === 12 && cleanNumber.startsWith('9')) {
-      const numberWithout9 = cleanNumber.substring(1);
-      console.log('2. Tentando sem o 9:', numberWithout9);
-      
+    // Se não encontrou, tenta sem o 9
+    if (userError) {
       const { data: userWithout9, error: userErrorWithout9 } = await supabase
         .from('users')
         .select('*')
-        .eq('whatsapp_number', numberWithout9)
+        .eq('whatsapp_number', cleanNumber)
         .single();
-      
-      console.log('Resultado sem 9:', { user: !!userWithout9, error: userErrorWithout9?.message });
       
       if (!userErrorWithout9 && userWithout9) {
         user = userWithout9;
@@ -66,41 +59,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Se não encontrou e o número tem 11 dígitos (sem 9), tenta com o 9
-    if (userError && cleanNumber.length === 11 && !cleanNumber.startsWith('9')) {
-      const numberWith9 = '9' + cleanNumber;
-      console.log('3. Tentando com o 9:', numberWith9);
-      
-      const { data: userWith9, error: userErrorWith9 } = await supabase
-        .from('users')
-        .select('*')
-        .eq('whatsapp_number', numberWith9)
-        .single();
-      
-      console.log('Resultado com 9:', { user: !!userWith9, error: userErrorWith9?.message });
-      
-      if (!userErrorWith9 && userWith9) {
-        user = userWith9;
-        userError = null;
-      }
-    }
-
-    // Se ainda não encontrou, tenta buscar por qualquer variação do número
+    // Se ainda não encontrou, tenta busca flexível
     if (userError) {
-      console.log('4. Tentando busca flexível para:', cleanNumber);
-      
       const { data: users, error: searchError } = await supabase
         .from('users')
         .select('*')
         .or(`whatsapp_number.eq.${cleanNumber},whatsapp_number.eq.9${cleanNumber},whatsapp_number.eq.${cleanNumber.substring(1)}`)
         .limit(1);
       
-      console.log('Resultado busca flexível:', { users: users?.length, error: searchError?.message });
-      
       if (!searchError && users && users.length > 0) {
         user = users[0];
         userError = null;
-        console.log('Usuário encontrado na busca flexível:', user.whatsapp_number);
       }
     }
 
