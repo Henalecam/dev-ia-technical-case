@@ -33,11 +33,63 @@ export async function POST(request: NextRequest) {
     console.log('Número extraído:', cleanNumber);
     console.log('RemoteJid original:', remoteJid);
 
-    const { data: user, error: userError } = await supabase
+    // Tenta buscar o usuário com o número exato
+    let { data: user, error: userError } = await supabase
       .from('users')
       .select('*')
       .eq('whatsapp_number', cleanNumber)
       .single();
+
+    // Se não encontrou e o número tem 12 dígitos (com 9), tenta sem o 9
+    if (userError && cleanNumber.length === 12 && cleanNumber.startsWith('9')) {
+      const numberWithout9 = cleanNumber.substring(1);
+      console.log('Tentando sem o 9:', numberWithout9);
+      
+      const { data: userWithout9, error: userErrorWithout9 } = await supabase
+        .from('users')
+        .select('*')
+        .eq('whatsapp_number', numberWithout9)
+        .single();
+      
+      if (!userErrorWithout9 && userWithout9) {
+        user = userWithout9;
+        userError = null;
+      }
+    }
+
+    // Se não encontrou e o número tem 11 dígitos (sem 9), tenta com o 9
+    if (userError && cleanNumber.length === 11 && !cleanNumber.startsWith('9')) {
+      const numberWith9 = '9' + cleanNumber;
+      console.log('Tentando com o 9:', numberWith9);
+      
+      const { data: userWith9, error: userErrorWith9 } = await supabase
+        .from('users')
+        .select('*')
+        .eq('whatsapp_number', numberWith9)
+        .single();
+      
+      if (!userErrorWith9 && userWith9) {
+        user = userWith9;
+        userError = null;
+      }
+    }
+
+    // Se ainda não encontrou, tenta buscar por qualquer variação do número
+    if (userError) {
+      console.log('Tentando busca flexível para:', cleanNumber);
+      
+      const { data: users, error: searchError } = await supabase
+        .from('users')
+        .select('*')
+        .or(`whatsapp_number.eq.${cleanNumber},whatsapp_number.eq.9${cleanNumber},whatsapp_number.eq.${cleanNumber.substring(1)}`)
+        .limit(1);
+      
+      if (!searchError && users && users.length > 0) {
+        user = users[0];
+        userError = null;
+        console.log('Usuário encontrado na busca flexível:', user.whatsapp_number);
+      }
+    }
 
     if (userError || !user) {
       console.log('Usuário não encontrado para o número:', cleanNumber);
