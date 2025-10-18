@@ -7,9 +7,11 @@ interface NavbarProps {
   userKey: string
   onLogout: () => void
   currentPage?: 'chat' | 'tasks'
+  onWhatsAppClick?: () => void
+  hasWhatsAppNumber?: boolean
 }
 
-export default function Navbar({ userKey, onLogout, currentPage = 'tasks' }: NavbarProps) {
+export default function Navbar({ userKey, onLogout, currentPage = 'tasks', onWhatsAppClick, hasWhatsAppNumber = false }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const navItems = [
@@ -54,18 +56,16 @@ export default function Navbar({ userKey, onLogout, currentPage = 'tasks' }: Nav
             ))}
             
             {/* WhatsApp Button */}
-            <button
-              onClick={() => {
-                const targetNumber = '5541999155948'
-                const message = encodeURIComponent('#todolist')
-                const url = `https://wa.me/${targetNumber}?text=${message}`
-                window.open(url, '_blank')
-              }}
-              className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:shadow-lg transition-all flex items-center space-x-2"
-            >
-              <span className="text-lg">💬</span>
-              <span>WhatsApp</span>
-            </button>
+            {onWhatsAppClick && (
+              <button
+                onClick={onWhatsAppClick}
+                className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:shadow-lg transition-all flex items-center space-x-2"
+                title={hasWhatsAppNumber ? 'Abrir WhatsApp' : 'Conectar WhatsApp'}
+              >
+                <span className="text-lg">💬</span>
+                <span>{hasWhatsAppNumber ? 'WhatsApp' : 'Conectar'}</span>
+              </button>
+            )}
 
             {/* User Info & Logout */}
             <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-gray-200">
@@ -115,19 +115,18 @@ export default function Navbar({ userKey, onLogout, currentPage = 'tasks' }: Nav
                 </Link>
               ))}
               
-              <button
-                onClick={() => {
-                  const targetNumber = '5541999155948'
-                  const message = encodeURIComponent('#todolist')
-                  const url = `https://wa.me/${targetNumber}?text=${message}`
-                  window.open(url, '_blank')
-                  setIsMenuOpen(false)
-                }}
-                className="w-full px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:shadow-lg transition-all flex items-center space-x-3"
-              >
-                <span className="text-lg">💬</span>
-                <span>WhatsApp</span>
-              </button>
+              {onWhatsAppClick && (
+                <button
+                  onClick={() => {
+                    onWhatsAppClick()
+                    setIsMenuOpen(false)
+                  }}
+                  className="w-full px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:shadow-lg transition-all flex items-center space-x-3"
+                >
+                  <span className="text-lg">💬</span>
+                  <span>{hasWhatsAppNumber ? 'WhatsApp' : 'Conectar'}</span>
+                </button>
+              )}
 
               <div className="pt-4 border-t border-gray-200">
                 <div className="px-4 py-2">

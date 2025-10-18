@@ -16,6 +16,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputMessage, setInputMessage] = useState('')
   const [loading, setLoading] = useState(false)
+  const [savedWhatsappNumber, setSavedWhatsappNumber] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -23,6 +24,7 @@ export default function ChatPage() {
     if (savedUserKey) {
       setUserKey(savedUserKey)
       setIsLoggedIn(true)
+      loadWhatsAppNumber(savedUserKey)
       
       const savedMessages = localStorage.getItem(`chat_messages_${savedUserKey}`)
       if (savedMessages) {
@@ -38,6 +40,32 @@ export default function ChatPage() {
     }
   }, [])
 
+  const loadWhatsAppNumber = async (key: string) => {
+    try {
+      const response = await axios.get(`/api/user?user_key=${key}`)
+      if (response.data && response.data.whatsapp_number) {
+        setSavedWhatsappNumber(response.data.whatsapp_number)
+      } else {
+        setSavedWhatsappNumber(null)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar número WhatsApp:', error)
+      setSavedWhatsappNumber(null)
+    }
+  }
+
+  const openWhatsApp = () => {
+    if (!savedWhatsappNumber || savedWhatsappNumber.trim() === '') {
+      window.location.href = '/tasks'
+      return
+    }
+    
+    const targetNumber = '5541999155948'
+    const message = encodeURIComponent('#todolist')
+    const url = `https://wa.me/${targetNumber}?text=${message}`
+    window.open(url, '_blank')
+  }
+
   useEffect(() => {
     if (isLoggedIn && userKey) {
       localStorage.setItem(`chat_messages_${userKey}`, JSON.stringify(messages))
@@ -49,6 +77,7 @@ export default function ChatPage() {
     if (userKey.trim()) {
       localStorage.setItem('userKey', userKey)
       setIsLoggedIn(true)
+      loadWhatsAppNumber(userKey)
       
       const savedMessages = localStorage.getItem(`chat_messages_${userKey}`)
       if (savedMessages) {
@@ -126,8 +155,6 @@ export default function ChatPage() {
     { label: 'Tarefas de alta prioridade', icon: '🔴', description: 'Tarefas urgentes que precisam de atenção' },
     { label: 'Tarefas para hoje', icon: '📅', description: 'Tarefas com prazo para hoje' },
     { label: 'Resumo das minhas tarefas', icon: '📊', description: 'Estatísticas e análise geral' },
-    { label: 'Criar nova tarefa', icon: '➕', description: 'Adicionar uma nova tarefa à lista' },
-    { label: 'Dicas de produtividade', icon: '💡', description: 'Sugestões para ser mais produtivo' },
   ]
 
   const handleQuickAction = (label: string) => {
@@ -178,7 +205,13 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-      <Navbar userKey={userKey} onLogout={handleLogout} currentPage="chat" />
+      <Navbar 
+        userKey={userKey} 
+        onLogout={handleLogout} 
+        currentPage="chat"
+        onWhatsAppClick={() => openWhatsApp()}
+        hasWhatsAppNumber={!!savedWhatsappNumber}
+      />
       
       <div className="max-w-6xl mx-auto p-4 h-[calc(100vh-4rem)] flex flex-col">
         {/* Chat Header */}
@@ -231,12 +264,18 @@ export default function ChatPage() {
             >
               <div className={`flex gap-3 max-w-[80%] ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                 {/* Avatar */}
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md ${
                   message.role === 'user'
                     ? 'bg-gradient-to-br from-blue-600 to-indigo-600'
                     : 'bg-gradient-to-br from-indigo-600 to-purple-600'
                 }`}>
-                  <span className="text-xl">{message.role === 'user' ? '👤' : '🤖'}</span>
+                  {message.role === 'user' ? (
+                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    </svg>
+                  ) : (
+                    <span className="text-xl">🤖</span>
+                  )}
                 </div>
                 
                 {/* Message Bubble */}
@@ -273,7 +312,7 @@ export default function ChatPage() {
           {loading && (
             <div className="flex justify-start animate-fade-in">
               <div className="flex gap-3 max-w-[80%]">
-                <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
                   <span className="text-xl">🤖</span>
                 </div>
                 <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl rounded-tl-sm p-4 shadow-lg border border-gray-200">
@@ -300,7 +339,7 @@ export default function ChatPage() {
               <span>⚡</span>
               Ações Rápidas
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {quickActions.map((action, idx) => (
                 <button
                   key={idx}

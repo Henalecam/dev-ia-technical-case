@@ -48,16 +48,16 @@ export default function TasksPage() {
   }
 
   const formatWhatsAppNumber = (value: string) => {
-    const numbers = value.replace(/\D/g, '')
+    const numbers = value.replace(/\D/g, '').slice(0, 11)
     
     if (numbers.length <= 2) {
       return numbers
-    } else if (numbers.length <= 7) {
+    } else if (numbers.length <= 6) {
       return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`
-    } else if (numbers.length <= 11) {
-      return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`
+    } else if (numbers.length <= 10) {
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`
     } else {
-      return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7)}`
     }
   }
 
@@ -75,7 +75,7 @@ export default function TasksPage() {
     const cleanNumber = whatsappNumber.replace(/\D/g, '')
     
     if (cleanNumber.length < 10 || cleanNumber.length > 11) {
-      alert('Digite um número válido no formato: (XX) XXXXX-XXXX')
+      alert('Digite um número válido.\nExemplos:\n(42) 9981-8268 ou\n(42) 91234-5678')
       return
     }
 
@@ -96,12 +96,18 @@ export default function TasksPage() {
       openWhatsApp(cleanNumber)
     } catch (error) {
       console.error('Erro ao salvar número WhatsApp:', error)
-      alert('Erro ao salvar número')
+      alert('Erro ao salvar número. Tente novamente.')
     }
   }
 
   const openWhatsApp = (number?: string) => {
     const userNumber = number || savedWhatsappNumber
+    
+    if (!userNumber || userNumber.trim() === '') {
+      setShowWhatsAppModal(true)
+      return
+    }
+    
     const targetNumber = '5541999155948'
     const message = encodeURIComponent('#todolist')
     const url = `https://wa.me/${targetNumber}?text=${message}`
@@ -278,7 +284,13 @@ export default function TasksPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <Navbar userKey={userKey} onLogout={handleLogout} currentPage="tasks" />
+      <Navbar 
+        userKey={userKey} 
+        onLogout={handleLogout} 
+        currentPage="tasks"
+        onWhatsAppClick={() => openWhatsApp()}
+        hasWhatsAppNumber={!!savedWhatsappNumber}
+      />
       
       <div className="py-6 px-4">
         <div className="max-w-6xl mx-auto">
@@ -296,7 +308,7 @@ export default function TasksPage() {
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => savedWhatsappNumber ? openWhatsApp() : setShowWhatsAppModal(true)}
+                  onClick={() => openWhatsApp()}
                   className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 rounded-xl hover:shadow-lg transition-all flex items-center gap-2"
                   title={savedWhatsappNumber ? 'Abrir WhatsApp' : 'Conectar WhatsApp'}
                 >
@@ -485,21 +497,21 @@ export default function TasksPage() {
                 )}
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-4">
                   <p className="text-sm text-blue-800">
-                    📱 <strong>Exemplo:</strong> (41) 99915-5948
+                    📱 <strong>Exemplo:</strong> (42) 99818-8268
+                  </p>
+                  <p className="text-xs text-blue-600 mt-1">
+                    Digite apenas números, a máscara será aplicada automaticamente
                   </p>
                 </div>
                 <input
                   type="tel"
                   value={whatsappNumber}
                   onChange={(e) => handleWhatsAppChange(e.target.value)}
-                  placeholder="(41) 99999-9999"
+                  placeholder="(42) 91234-5678"
                   maxLength={15}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-500 transition-all mb-4 text-lg tracking-wide"
                   autoFocus
                 />
-                <p className="text-xs text-gray-500 -mt-3 mb-4">
-                  ✓ Formato: (DDD) XXXXX-XXXX
-                </p>
                 <p className="text-sm text-gray-500 mb-4">
                   💡 Você será direcionado para conversar com nosso bot e receberá suas tarefas com o comando <strong>#todolist</strong>
                 </p>
