@@ -3,6 +3,8 @@ import axios from 'axios'
 import { supabase } from '@/lib/supabase'
 import { marked } from 'marked'
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   const body = await request.json()
   const { message, user_key } = body
