@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { title, description, user_key } = body
+    const { title, description, user_key, additional_context } = body
 
     if (!title) {
       return NextResponse.json(
@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
       description: description || '',
       action: 'generate_description',
       user_key,
+      additional_context: additional_context || '',
     }, {
       headers: {
         'Content-Type': 'application/json',
