@@ -22,6 +22,13 @@ export default function TasksPage() {
   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false)
   const [whatsappNumber, setWhatsappNumber] = useState('')
   const [savedWhatsappNumber, setSavedWhatsappNumber] = useState<string | null>(null)
+  const [generatingDescription, setGeneratingDescription] = useState(false)
+  const [editingTask, setEditingTask] = useState<Task | null>(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editDescription, setEditDescription] = useState('')
+  const [editPriority, setEditPriority] = useState<'low' | 'medium' | 'high'>('medium')
+  const [editTags, setEditTags] = useState('')
+  const [editDueDate, setEditDueDate] = useState('')
 
   useEffect(() => {
     const savedUserKey = localStorage.getItem('userKey')
@@ -142,6 +149,119 @@ export default function TasksPage() {
       alert('Erro ao carregar tarefas. Verifique sua conexão.')
     }
     setLoading(false)
+  }
+
+  // Função para converter HTML para texto simples para textareas
+  const htmlToText = (html: string) => {
+    const temp = document.createElement('div')
+    temp.innerHTML = html
+    return temp.textContent || temp.innerText || ''
+  }
+
+  const generateDescription = async (isEditing: boolean = false) => {
+    const title = isEditing ? editTitle : newTaskTitle
+    const currentDescription = isEditing ? editDescription : newTaskDescription
+    
+    if (!title.trim()) {
+      alert('Digite um título para a tarefa antes de gerar a descrição')
+      return
+    }
+
+    setGeneratingDescription(true)
+    try {
+
+      const response = await axios.post('/api/generate-description', {
+        title: title,
+        description: currentDescription,
+        user_key: userKey,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        timeout: 30000,
+      })
+
+
+      if (response.data && response.data.description) {
+        // Converte HTML para texto simples para os textareas
+        const plainTextDescription = htmlToText(response.data.description)
+        
+        if (isEditing) {
+          setEditDescription(plainTextDescription)
+        } else {
+          setNewTaskDescription(plainTextDescription)
+        }
+      } else if (typeof response.data === 'string') {
+        if (isEditing) {
+          setEditDescription(response.data)
+        } else {
+          setNewTaskDescription(response.data)
+        }
+      } else {
+        console.error('Formato de resposta inesperado:', response.data)
+        alert('IA respondeu, mas o formato não foi reconhecido. Verifique o console.')
+      }
+    } catch (error: any) {
+      console.error('Erro ao gerar descrição:', error)
+      console.error('Detalhes:', error.response?.data)
+
+      if (error.response?.status === 400) {
+        alert('❌ Dados inválidos.\n\nVerifique se preencheu o título corretamente.')
+      } else if (error.response?.status === 500) {
+        const details = error.response?.data?.details || ''
+        alert(`❌ Erro no servidor ao gerar descrição.\n\n${details}\n\nVerifique se o N8N está configurado corretamente.`)
+      } else if (error.code === 'ECONNABORTED') {
+        alert('⏱️ Tempo esgotado. A IA está demorando muito para responder.')
+      } else {
+        const errorMsg = error.response?.data?.error || error.message
+        alert(`❌ Erro ao gerar descrição com IA.\n\n${errorMsg}`)
+      }
+    } finally {
+      setGeneratingDescription(false)
+    }
+  }
+
+  const startEditTask = (task: Task) => {
+    setEditingTask(task)
+    setEditTitle(task.title)
+    // Converte HTML para texto simples para edição
+    setEditDescription(task.description ? htmlToText(task.description) : '')
+    setEditPriority(task.priority)
+    setEditTags(task.tags ? task.tags.join(', ') : '')
+    setEditDueDate(task.due_date || '')
+  }
+
+  const cancelEdit = () => {
+    setEditingTask(null)
+    setEditTitle('')
+    setEditDescription('')
+    setEditPriority('medium')
+    setEditTags('')
+    setEditDueDate('')
+  }
+
+  const saveEditTask = async () => {
+    if (!editTitle.trim()) {
+      alert('Digite um título para a tarefa')
+      return
+    }
+
+    try {
+      const tags = editTags.split(',').map(tag => tag.trim()).filter(tag => tag)
+      const response = await axios.put('/api/tasks', {
+        id: editingTask?.id,
+        title: editTitle,
+        description: editDescription,
+        priority: editPriority,
+        tags: tags,
+        due_date: editDueDate || null,
+      })
+      setTasks(tasks.map(t => t.id === editingTask?.id ? response.data : t))
+      cancelEdit()
+    } catch (error) {
+      console.error('Erro ao atualizar tarefa:', error)
+      alert('Erro ao atualizar tarefa')
+    }
   }
 
   const addTask = async () => {
@@ -370,13 +490,34 @@ export default function TasksPage() {
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all"
                   autoFocus
                 />
-                <textarea
-                  value={newTaskDescription}
-                  onChange={(e) => setNewTaskDescription(e.target.value)}
-                  placeholder="Descrição (opcional)"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all resize-none"
-                  rows={3}
-                />
+                <div className="relative">
+                  <textarea
+                    value={newTaskDescription}
+                    onChange={(e) => setNewTaskDescription(e.target.value)}
+                    placeholder="Descrição (opcional)"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all resize-none"
+                    rows={3}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => generateDescription(false)}
+                    disabled={generatingDescription || !newTaskTitle.trim()}
+                    className="mt-3 w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all flex items-center justify-center gap-2 font-medium disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed"
+                    title={!newTaskTitle.trim() ? 'Digite um título primeiro' : 'Gerar descrição com IA'}
+                  >
+                    {generatingDescription ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Gerando com IA...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-xl">🤖</span>
+                        <span>Gerar Descrição com IA</span>
+                      </>
+                    )}
+                  </button>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <select
                     value={newTaskPriority}
@@ -547,6 +688,119 @@ export default function TasksPage() {
             </div>
           )}
 
+          {editingTask && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <span>✏️</span>
+                    Editar Tarefa
+                  </h3>
+                  <button
+                    onClick={cancelEdit}
+                    className="text-gray-400 hover:text-gray-600 text-2xl"
+                  >
+                    ×
+                  </button>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Título</label>
+                    <input
+                      type="text"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      placeholder="Título da tarefa"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Descrição</label>
+                    <textarea
+                      value={editDescription}
+                      onChange={(e) => setEditDescription(e.target.value)}
+                      placeholder="Descrição (opcional)"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all resize-none"
+                      rows={4}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => generateDescription(true)}
+                      disabled={generatingDescription || !editTitle.trim()}
+                      className="mt-3 w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all flex items-center justify-center gap-2 font-medium disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed"
+                      title={!editTitle.trim() ? 'Digite um título primeiro' : 'Gerar descrição com IA'}
+                    >
+                      {generatingDescription ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Gerando com IA...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-xl">🤖</span>
+                          <span>Gerar/Melhorar Descrição com IA</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Prioridade</label>
+                      <select
+                        value={editPriority}
+                        onChange={(e) => setEditPriority(e.target.value as 'low' | 'medium' | 'high')}
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all"
+                      >
+                        <option value="low">🟢 Baixa</option>
+                        <option value="medium">🟡 Média</option>
+                        <option value="high">🔴 Alta</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                      <input
+                        type="text"
+                        value={editTags}
+                        onChange={(e) => setEditTags(e.target.value)}
+                        placeholder="Tags (separadas por vírgula)"
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Data de Entrega</label>
+                      <input
+                        type="date"
+                        value={editDueDate}
+                        onChange={(e) => setEditDueDate(e.target.value)}
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      onClick={saveEditTask}
+                      className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl hover:shadow-lg transition-all font-medium"
+                    >
+                      💾 Salvar Alterações
+                    </button>
+                    <button
+                      onClick={cancelEdit}
+                      className="px-8 bg-gray-100 text-gray-700 py-3 rounded-xl hover:bg-gray-200 transition-all font-medium"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {loading ? (
             <div className="text-center py-12 bg-white rounded-2xl shadow-lg">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
@@ -588,13 +842,14 @@ export default function TasksPage() {
                       </h3>
 
                       {task.description && (
-                        <p
-                          className={`text-sm mb-3 line-clamp-2 ${
+                        <div
+                          className={`text-sm mb-3 line-clamp-2 prose prose-sm max-w-none prose-p:my-1 prose-headings:font-semibold prose-ul:my-1 prose-ol:my-1 prose-li:my-0 ${
                             task.completed ? 'line-through text-gray-400' : 'text-gray-600'
                           }`}
-                        >
-                          {task.description}
-                        </p>
+                          dangerouslySetInnerHTML={{ 
+                            __html: task.description
+                          }}
+                        />
                       )}
 
                       <div className="flex flex-wrap gap-2 mb-3">
@@ -613,59 +868,71 @@ export default function TasksPage() {
                     </div>
 
                     <div className="mt-auto pt-3 border-t border-gray-200">
-                      <div className="flex gap-1 items-center mb-2">
-                        <span className="text-xs text-gray-500 mr-1">Prioridade:</span>
+                      <div className="flex gap-2 items-center mb-2 flex-wrap">
                         <button
-                          onClick={() => quickUpdatePriority(task, 'low')}
-                          className={`px-2 py-1 rounded-lg text-xs transition-all ${
-                            task.priority === 'low' ? 'bg-green-500 text-white shadow' : 'bg-gray-100 hover:bg-green-100'
-                          }`}
+                          onClick={() => startEditTask(task)}
+                          className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-xs hover:bg-blue-200 transition-all font-medium flex items-center gap-1"
                         >
-                          🟢
+                          <span>✏️</span>
+                          <span>Editar</span>
                         </button>
-                        <button
-                          onClick={() => quickUpdatePriority(task, 'medium')}
-                          className={`px-2 py-1 rounded-lg text-xs transition-all ${
-                            task.priority === 'medium' ? 'bg-yellow-500 text-white shadow' : 'bg-gray-100 hover:bg-yellow-100'
-                          }`}
-                        >
-                          🟡
-                        </button>
-                        <button
-                          onClick={() => quickUpdatePriority(task, 'high')}
-                          className={`px-2 py-1 rounded-lg text-xs transition-all ${
-                            task.priority === 'high' ? 'bg-red-500 text-white shadow' : 'bg-gray-100 hover:bg-red-100'
-                          }`}
-                        >
-                          🔴
-                        </button>
-                        <div className="flex-1"></div>
                         {deleteConfirm === task.id ? (
                           <div className="flex gap-1">
                             <button
                               onClick={() => deleteTask(task.id)}
-                              className="px-2 py-1 bg-red-500 text-white rounded-lg text-xs hover:bg-red-600"
+                              className="px-3 py-1.5 bg-red-500 text-white rounded-lg text-xs hover:bg-red-600 font-medium"
                             >
-                              ✓
+                              ✓ Confirmar
                             </button>
                             <button
                               onClick={() => setDeleteConfirm(null)}
-                              className="px-2 py-1 bg-gray-300 text-gray-700 rounded-lg text-xs hover:bg-gray-400"
+                              className="px-3 py-1.5 bg-gray-300 text-gray-700 rounded-lg text-xs hover:bg-gray-400 font-medium"
                             >
-                              ✕
+                              ✕ Cancelar
                             </button>
                           </div>
                         ) : (
                           <button
                             onClick={() => setDeleteConfirm(task.id)}
-                            className="px-2 py-1 bg-red-100 text-red-600 rounded-lg text-xs hover:bg-red-200"
+                            className="px-3 py-1.5 bg-red-100 text-red-600 rounded-lg text-xs hover:bg-red-200 transition-all font-medium flex items-center gap-1"
                           >
-                            🗑️
+                            <span>🗑️</span>
+                            <span>Excluir</span>
                           </button>
                         )}
+                        <div className="flex-1"></div>
+                        <div className="flex gap-1 items-center">
+                          <button
+                            onClick={() => quickUpdatePriority(task, 'low')}
+                            className={`w-8 h-8 rounded-lg text-sm transition-all flex items-center justify-center ${
+                              task.priority === 'low' ? 'bg-green-500 text-white shadow-md' : 'bg-gray-100 hover:bg-green-100'
+                            }`}
+                            title="Prioridade Baixa"
+                          >
+                            🟢
+                          </button>
+                          <button
+                            onClick={() => quickUpdatePriority(task, 'medium')}
+                            className={`w-8 h-8 rounded-lg text-sm transition-all flex items-center justify-center ${
+                              task.priority === 'medium' ? 'bg-yellow-500 text-white shadow-md' : 'bg-gray-100 hover:bg-yellow-100'
+                            }`}
+                            title="Prioridade Média"
+                          >
+                            🟡
+                          </button>
+                          <button
+                            onClick={() => quickUpdatePriority(task, 'high')}
+                            className={`w-8 h-8 rounded-lg text-sm transition-all flex items-center justify-center ${
+                              task.priority === 'high' ? 'bg-red-500 text-white shadow-md' : 'bg-gray-100 hover:bg-red-100'
+                            }`}
+                            title="Prioridade Alta"
+                          >
+                            🔴
+                          </button>
+                        </div>
                       </div>
                       <p className="text-xs text-gray-400 mt-2">
-                        {new Date(task.created_at).toLocaleDateString('pt-BR')}
+                        Criada em {new Date(task.created_at).toLocaleDateString('pt-BR')}
                       </p>
                     </div>
                   </div>
