@@ -426,18 +426,6 @@ export default function TasksPage() {
                   {userKey}
                 </p>
               </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => openWhatsApp()}
-                  className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 rounded-xl hover:shadow-lg transition-all flex items-center gap-2"
-                  title={savedWhatsappNumber ? 'Abrir WhatsApp' : 'Conectar WhatsApp'}
-                >
-                  <span>💬</span>
-                  <span className="hidden sm:inline">
-                    {savedWhatsappNumber ? 'WhatsApp' : 'Conectar'}
-                  </span>
-                </button>
-              </div>
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
