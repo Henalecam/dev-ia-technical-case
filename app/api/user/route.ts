@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
 
   if (!userKey) {
     return NextResponse.json(
-      { error: 'user_key (email) é obrigatório' },
+      { error: 'user_key (email) is required' },
       { status: 400 }
     )
   }
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
   if (!user_key || !whatsapp_number) {
     return NextResponse.json(
-      { error: 'user_key e whatsapp_number são obrigatórios' },
+      { error: 'user_key and whatsapp_number are required' },
       { status: 400 }
     )
   }

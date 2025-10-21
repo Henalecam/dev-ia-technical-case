@@ -3,11 +3,11 @@ import { supabase } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
-  const identifier = searchParams.get('identifier') // Email ou WhatsApp
+  const identifier = searchParams.get('identifier')
 
   if (!identifier) {
     return NextResponse.json(
-      { error: 'identifier é obrigatório (email ou whatsapp)' },
+      { error: 'identifier is required (email or whatsapp)' },
       { status: 400 }
     )
   }
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: 'Usuário não encontrado', identifier },
+        { error: 'User not found', identifier },
         { status: 404 }
       )
     }
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     })
   } catch (error: any) {
     return NextResponse.json(
-      { error: 'Erro ao buscar usuário', details: error.message },
+      { error: 'Error fetching user', details: error.message },
       { status: 500 }
     )
   }

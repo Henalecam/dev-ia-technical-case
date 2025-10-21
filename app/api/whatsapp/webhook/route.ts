@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
             timeout: 30000,
           })
         } catch (error) {
-          console.error('Erro ao chamar N8N Evolution webhook:', error)
+          console.error('Error calling N8N Evolution webhook:', error)
         }
       }
 
@@ -57,9 +57,9 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('Erro no webhook WhatsApp:', error)
+    console.error('Error in WhatsApp webhook:', error)
     return NextResponse.json(
-      { error: 'Erro ao processar webhook', details: error.message },
+      { error: 'Error processing webhook', details: error.message },
       { status: 500 }
     )
   }
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   return NextResponse.json({ 
-    status: 'WhatsApp webhook ativo',
+    status: 'WhatsApp webhook active',
     timestamp: new Date().toISOString()
   })
 }

@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     
     if (!remoteJid) {
       return NextResponse.json(
-        { error: 'remoteJid é obrigatório' },
+        { error: 'remoteJid is required' },
         { status: 400 }
       );
     }
@@ -74,9 +74,9 @@ export async function POST(request: NextRequest) {
     }
 
     if (userError || !user) {
-      console.log('Usuário não encontrado para o número:', cleanNumber);
+      console.log('User not found for number:', cleanNumber);
       return NextResponse.json({
-        error: 'Usuário não encontrado. Por favor, cadastre-se primeiro no sistema.',
+        error: 'User not found. Please register in the system first.',
         user_email: null,
         tasks: [],
         remoteJid: remoteJid
@@ -90,14 +90,14 @@ export async function POST(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (tasksError) {
-      console.error('Erro ao buscar tarefas:', tasksError);
+      console.error('Error fetching tasks:', tasksError);
       return NextResponse.json(
-        { error: 'Erro ao buscar tarefas' },
+        { error: 'Error fetching tasks' },
         { status: 500 }
       );
     }
 
-    console.log('Tarefas encontradas:', tasks?.length || 0);
+    console.log('Tasks found:', tasks?.length || 0);
 
     const formattedTasks = tasks?.map(task => ({
       id: task.id,
@@ -120,9 +120,9 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Erro na API WhatsApp tasks:', error);
+    console.error('Error in WhatsApp tasks API:', error);
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

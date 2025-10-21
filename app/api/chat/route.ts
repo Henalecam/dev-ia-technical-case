@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
   if (!message || !user_key) {
     return NextResponse.json(
-      { error: 'message e user_key são obrigatórios' },
+      { error: 'message and user_key are required' },
       { status: 400 }
     )
   }
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       .limit(20)
 
     if (tasksError) {
-      console.error('Erro ao buscar tasks:', tasksError)
+      console.error('Error fetching tasks:', tasksError)
     }
 
     const { data: userFullData, error: userDataError } = await supabase
@@ -61,14 +61,14 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (userDataError) {
-      console.error('Erro ao buscar dados do usuário:', userDataError)
+      console.error('Error fetching user data:', userDataError)
     }
 
     const n8nChatWebhookUrl = process.env.N8N_CHAT_WEBHOOK_URL || process.env.N8N_WEBHOOK_URL
 
     if (!n8nChatWebhookUrl) {
       return NextResponse.json(
-        { error: 'N8N_CHAT_WEBHOOK_URL não configurado' },
+        { error: 'N8N_CHAT_WEBHOOK_URL not configured' },
         { status: 500 }
       )
     }
@@ -93,12 +93,12 @@ export async function POST(request: NextRequest) {
     
     console.log('Full N8N response:', response.data);
     
-    let rawReply = 'Resposta recebida';
+    let rawReply = 'Response received';
     let userEmail = user_key;
     
     try {
       if (response.data && typeof response.data === 'object') {
-        rawReply = response.data.reply || response.data.message || 'Resposta recebida';
+        rawReply = response.data.reply || response.data.message || 'Response received';
         userEmail = response.data.user_email || user_key;
       } else if (typeof response.data === 'string') {
         const replyMatch = response.data.match(/"reply":\s*"([\s\S]*?)",\s*"user_email"/);
@@ -112,8 +112,8 @@ export async function POST(request: NextRequest) {
         }
       }
     } catch (error) {
-      console.error('Erro ao extrair dados do N8N:', error);
-      rawReply = 'Erro ao processar resposta';
+      console.error('Error extracting data from N8N:', error);
+      rawReply = 'Error processing response';
     }
     
     console.log('Raw reply from N8N:', rawReply);
@@ -130,10 +130,10 @@ export async function POST(request: NextRequest) {
       user_email: userEmail,
     })
   } catch (error: any) {
-    console.error('Erro ao comunicar com N8N:', error)
+    console.error('Error communicating with N8N:', error)
     return NextResponse.json(
       { 
-        error: 'Erro ao processar mensagem',
+        error: 'Error processing message',
         details: error.message 
       },
       { status: 500 }

@@ -52,7 +52,7 @@ export default function TasksPage() {
         setSavedWhatsappNumber(null)
       }
     } catch (error) {
-      console.error('Erro ao carregar número WhatsApp:', error)
+      console.error('Error loading WhatsApp number:', error)
       setSavedWhatsappNumber(null)
     }
   }
@@ -78,20 +78,20 @@ export default function TasksPage() {
 
   const saveWhatsAppNumber = async () => {
     if (!whatsappNumber.trim()) {
-      alert('Digite seu número de WhatsApp')
+      alert('Enter your WhatsApp number')
       return
     }
 
     const cleanNumber = whatsappNumber.replace(/\D/g, '')
     
     if (cleanNumber.length < 10 || cleanNumber.length > 11) {
-      alert('Digite um número válido.\nExemplos:\n(42) 9981-8268 ou\n(42) 91234-5678')
+      alert('Enter a valid number.\nExamples:\n(42) 9981-8268 or\n(42) 91234-5678')
       return
     }
 
     const ddd = parseInt(cleanNumber.substring(0, 2))
     if (ddd < 11 || ddd > 99) {
-      alert('DDD inválido! Use um DDD válido (11 a 99)')
+      alert('Invalid area code! Use a valid area code (11 to 99)')
       return
     }
 
@@ -105,8 +105,8 @@ export default function TasksPage() {
       setWhatsappNumber('')
       openWhatsApp(cleanNumber)
     } catch (error) {
-      console.error('Erro ao salvar número WhatsApp:', error)
-      alert('Erro ao salvar número. Tente novamente.')
+      console.error('Error saving WhatsApp number:', error)
+      alert('Error saving number. Please try again.')
     }
   }
 
@@ -134,7 +134,7 @@ export default function TasksPage() {
   }
 
   const handleLogout = () => {
-    if (confirm('Tem certeza que deseja sair?')) {
+    if (confirm('Are you sure you want to logout?')) {
       localStorage.removeItem('userKey')
       setIsLoggedIn(false)
       setUserKey('')
@@ -148,8 +148,8 @@ export default function TasksPage() {
       const response = await axios.get(`/api/tasks?user_key=${key}`)
       setTasks(response.data)
     } catch (error) {
-      console.error('Erro ao carregar tarefas:', error)
-      alert('Erro ao carregar tarefas. Verifique sua conexão.')
+      console.error('Error loading tasks:', error)
+      alert('Error loading tasks. Check your connection.')
     }
     setLoading(false)
   }
@@ -164,7 +164,7 @@ export default function TasksPage() {
     const title = isEditing ? editTitle : newTaskTitle
     
     if (!title.trim()) {
-      alert('Digite um título para a tarefa antes de gerar a descrição')
+      alert('Enter a title for the task before generating the description')
       return
     }
 
@@ -208,23 +208,23 @@ export default function TasksPage() {
           setNewTaskDescription(response.data)
         }
       } else {
-        console.error('Formato de resposta inesperado:', response.data)
-        alert('IA respondeu, mas o formato não foi reconhecido. Verifique o console.')
+        console.error('Unexpected response format:', response.data)
+        alert('AI responded, but the format was not recognized. Check the console.')
       }
     } catch (error: any) {
-      console.error('Erro ao gerar descrição:', error)
-      console.error('Detalhes:', error.response?.data)
+      console.error('Error generating description:', error)
+      console.error('Details:', error.response?.data)
 
       if (error.response?.status === 400) {
-        alert('❌ Dados inválidos.\n\nVerifique se preencheu o título corretamente.')
+        alert('❌ Invalid data.\n\nCheck if you filled in the title correctly.')
       } else if (error.response?.status === 500) {
         const details = error.response?.data?.details || ''
-        alert(`❌ Erro no servidor ao gerar descrição.\n\n${details}\n\nVerifique se o N8N está configurado corretamente.`)
+        alert(`❌ Server error generating description.\n\n${details}\n\nCheck if N8N is configured correctly.`)
       } else if (error.code === 'ECONNABORTED') {
-        alert('⏱️ Tempo esgotado. A IA está demorando muito para responder.')
+        alert('⏱️ Timeout. The AI is taking too long to respond.')
       } else {
         const errorMsg = error.response?.data?.error || error.message
-        alert(`❌ Erro ao gerar descrição com IA.\n\n${errorMsg}`)
+        alert(`❌ Error generating description with AI.\n\n${errorMsg}`)
       }
     } finally {
       setGeneratingDescription(false)
@@ -234,7 +234,6 @@ export default function TasksPage() {
   const startEditTask = (task: Task) => {
     setEditingTask(task)
     setEditTitle(task.title)
-    // Converte HTML para texto simples para edição
     setEditDescription(task.description ? htmlToText(task.description) : '')
     setEditPriority(task.priority)
     setEditTags(task.tags ? task.tags.join(', ') : '')
@@ -252,7 +251,7 @@ export default function TasksPage() {
 
   const saveEditTask = async () => {
     if (!editTitle.trim()) {
-      alert('Digite um título para a tarefa')
+      alert('Enter a title for the task')
       return
     }
 
@@ -269,14 +268,14 @@ export default function TasksPage() {
       setTasks(tasks.map(t => t.id === editingTask?.id ? response.data : t))
       cancelEdit()
     } catch (error) {
-      console.error('Erro ao atualizar tarefa:', error)
-      alert('Erro ao atualizar tarefa')
+      console.error('Error updating task:', error)
+      alert('Error updating task')
     }
   }
 
   const addTask = async () => {
     if (!newTaskTitle.trim()) {
-      alert('Digite um título para a tarefa')
+      alert('Enter a title for the task')
       return
     }
 
@@ -298,8 +297,8 @@ export default function TasksPage() {
       setNewTaskDueDate('')
       setShowForm(false)
     } catch (error) {
-      console.error('Erro ao adicionar tarefa:', error)
-      alert('Erro ao adicionar tarefa')
+      console.error('Error adding task:', error)
+      alert('Error adding task')
     }
   }
 
@@ -311,7 +310,7 @@ export default function TasksPage() {
       })
       setTasks(tasks.map(t => t.id === task.id ? response.data : t))
     } catch (error) {
-      console.error('Erro ao atualizar tarefa:', error)
+      console.error('Error updating task:', error)
     }
   }
 
@@ -323,7 +322,7 @@ export default function TasksPage() {
       })
       setTasks(tasks.map(t => t.id === task.id ? response.data : t))
     } catch (error) {
-      console.error('Erro ao atualizar prioridade:', error)
+      console.error('Error updating priority:', error)
     }
   }
 
@@ -333,7 +332,7 @@ export default function TasksPage() {
       setTasks(tasks.filter(t => t.id !== id))
       setDeleteConfirm(null)
     } catch (error) {
-      console.error('Erro ao deletar tarefa:', error)
+      console.error('Error deleting task:', error)
     }
   }
 
@@ -385,14 +384,14 @@ export default function TasksPage() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
               TaskFlow AI
             </h1>
-            <p className="text-gray-600">Gerencie suas tarefas com inteligência</p>
+            <p className="text-gray-600">Manage your tasks intelligently</p>
           </div>
           <input
             type="text"
             value={userKey}
             onChange={(e) => setUserKey(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-            placeholder="Digite seu email"
+            placeholder="Enter your email"
             className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 mb-4 transition-all"
           />
           <button
@@ -405,7 +404,7 @@ export default function TasksPage() {
             }}
             className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl hover:shadow-lg transition-all font-medium"
           >
-            Entrar
+            Login
           </button>
         </div>
       </div>
@@ -429,7 +428,7 @@ export default function TasksPage() {
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
               <div>
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  Minhas Tarefas
+                  My Tasks
                 </h1>
                 <p className="text-gray-600 flex items-center gap-2 mt-1">
                   <span className="w-2 h-2 bg-green-500 rounded-full"></span>
@@ -444,15 +443,15 @@ export default function TasksPage() {
                 <p className="text-3xl font-bold">{stats.total}</p>
               </div>
               <div className="bg-gradient-to-br from-yellow-500 to-orange-500 text-white p-4 rounded-xl">
-                <p className="text-sm opacity-90">Pendentes</p>
+                <p className="text-sm opacity-90">Pending</p>
                 <p className="text-3xl font-bold">{stats.pending}</p>
               </div>
               <div className="bg-gradient-to-br from-green-500 to-emerald-600 text-white p-4 rounded-xl">
-                <p className="text-sm opacity-90">Concluídas</p>
+                <p className="text-sm opacity-90">Completed</p>
                 <p className="text-3xl font-bold">{stats.completed}</p>
               </div>
               <div className="bg-gradient-to-br from-red-500 to-pink-600 text-white p-4 rounded-xl">
-                <p className="text-sm opacity-90">Urgentes</p>
+                <p className="text-sm opacity-90">Urgent</p>
                 <p className="text-3xl font-bold">{stats.high}</p>
               </div>
             </div>
@@ -464,14 +463,14 @@ export default function TasksPage() {
               className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-2xl hover:shadow-xl transition-all font-medium mb-6 flex items-center justify-center gap-2"
             >
               <span className="text-2xl">+</span>
-              <span>Nova Tarefa</span>
+              <span>New Task</span>
             </button>
           )}
 
           {showForm && (
             <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 border border-gray-100">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-gray-800">Nova Tarefa</h2>
+                <h2 className="text-xl font-bold text-gray-800">New Task</h2>
                 <button
                   onClick={() => setShowForm(false)}
                   className="text-gray-400 hover:text-gray-600 text-2xl"
@@ -484,7 +483,7 @@ export default function TasksPage() {
                   type="text"
                   value={newTaskTitle}
                   onChange={(e) => setNewTaskTitle(e.target.value)}
-                  placeholder="Título da tarefa"
+                  placeholder="Task title"
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all"
                   autoFocus
                 />
@@ -492,7 +491,7 @@ export default function TasksPage() {
                   <textarea
                     value={newTaskDescription}
                     onChange={(e) => setNewTaskDescription(e.target.value)}
-                    placeholder="Descrição (opcional)"
+                    placeholder="Description (optional)"
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all resize-none"
                     rows={3}
                   />
@@ -501,17 +500,17 @@ export default function TasksPage() {
                     onClick={() => openAIPromptModal(false)}
                     disabled={generatingDescription || !newTaskTitle.trim()}
                     className="mt-3 w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all flex items-center justify-center gap-2 font-medium disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed"
-                    title={!newTaskTitle.trim() ? 'Digite um título primeiro' : 'Gerar descrição com IA'}
+                    title={!newTaskTitle.trim() ? 'Enter a title first' : 'Generate description with AI'}
                   >
                     {generatingDescription ? (
                       <>
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Gerando com IA...</span>
+                        <span>Generating with AI...</span>
                       </>
                     ) : (
                       <>
                         <span className="text-xl">🤖</span>
-                        <span>Gerar Descrição com IA</span>
+                        <span>Generate Description with AI</span>
                       </>
                     )}
                   </button>
@@ -522,15 +521,15 @@ export default function TasksPage() {
                     onChange={(e) => setNewTaskPriority(e.target.value as 'low' | 'medium' | 'high')}
                     className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all"
                   >
-                    <option value="low">🟢 Baixa</option>
-                    <option value="medium">🟡 Média</option>
-                    <option value="high">🔴 Alta</option>
+                    <option value="low">🟢 Low</option>
+                    <option value="medium">🟡 Medium</option>
+                    <option value="high">🔴 High</option>
                   </select>
                   <input
                     type="text"
                     value={newTaskTags}
                     onChange={(e) => setNewTaskTags(e.target.value)}
-                    placeholder="Tags (separadas por vírgula)"
+                    placeholder="Tags (comma separated)"
                     className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all"
                   />
                   <input
@@ -545,13 +544,13 @@ export default function TasksPage() {
                     onClick={addTask}
                     className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl hover:shadow-lg transition-all font-medium"
                   >
-                    Criar Tarefa
+                    Create Task
                   </button>
                   <button
                     onClick={() => setShowForm(false)}
                     className="px-6 bg-gray-100 text-gray-700 py-3 rounded-xl hover:bg-gray-200 transition-all"
                   >
-                    Cancelar
+                    Cancel
                   </button>
                 </div>
               </div>
@@ -569,7 +568,7 @@ export default function TasksPage() {
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
-                  Todas ({stats.total})
+                  All ({stats.total})
                 </button>
                 <button
                   onClick={() => setFilter('pending')}
@@ -579,7 +578,7 @@ export default function TasksPage() {
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
-                  Pendentes ({stats.pending})
+                  Pending ({stats.pending})
                 </button>
                 <button
                   onClick={() => setFilter('completed')}
@@ -589,7 +588,7 @@ export default function TasksPage() {
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
-                  Concluídas ({stats.completed})
+                  Completed ({stats.completed})
                 </button>
               </div>
               <select
@@ -597,8 +596,8 @@ export default function TasksPage() {
                 onChange={(e) => setSortBy(e.target.value as 'date' | 'priority')}
                 className="px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all"
               >
-                <option value="date">📅 Por Data</option>
-                <option value="priority">🎯 Por Prioridade</option>
+                <option value="date">📅 By Date</option>
+                <option value="priority">🎯 By Priority</option>
               </select>
             </div>
           </div>
@@ -608,7 +607,7 @@ export default function TasksPage() {
               <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xl font-bold text-gray-800">
-                    📱 {savedWhatsappNumber ? 'Atualizar' : 'Conectar'} WhatsApp
+                    📱 {savedWhatsappNumber ? 'Update' : 'Connect'} WhatsApp
                   </h3>
                   <button
                     onClick={() => {
@@ -623,23 +622,23 @@ export default function TasksPage() {
                 {savedWhatsappNumber ? (
                   <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-4">
                     <p className="text-sm text-green-800">
-                      ✓ Número atual: <strong>{formatWhatsAppNumber(savedWhatsappNumber)}</strong>
+                      ✓ Current number: <strong>{formatWhatsAppNumber(savedWhatsappNumber)}</strong>
                     </p>
                     <p className="text-xs text-green-600 mt-1">
-                      Digite um novo número para atualizar
+                      Enter a new number to update
                     </p>
                   </div>
                 ) : (
                   <p className="text-gray-600 mb-4">
-                    Digite seu número de WhatsApp para receber suas tarefas diretamente no celular!
+                    Enter your WhatsApp number to receive your tasks directly on your phone!
                   </p>
                 )}
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-4">
                   <p className="text-sm text-blue-800">
-                    📱 <strong>Exemplo:</strong> (42) 91234-5678
+                    📱 <strong>Example:</strong> (42) 91234-5678
                   </p>
                   <p className="text-xs text-blue-600 mt-1">
-                    Digite apenas números, a máscara será aplicada automaticamente
+                    Enter only numbers, the mask will be applied automatically
                   </p>
                 </div>
                 <input
@@ -652,14 +651,14 @@ export default function TasksPage() {
                   autoFocus
                 />
                 <p className="text-sm text-gray-500 mb-4">
-                  💡 Você será direcionado para conversar com nosso bot e receberá suas tarefas com o comando <strong>#todolist</strong>
+                  💡 You will be directed to chat with our bot and receive your tasks with the command <strong>#todolist</strong>
                 </p>
                 <div className="flex gap-2">
                   <button
                     onClick={saveWhatsAppNumber}
                     className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-xl hover:shadow-lg transition-all font-medium"
                   >
-                    {savedWhatsappNumber ? '🔄 Atualizar e Abrir' : '💬 Conectar WhatsApp'}
+                    {savedWhatsappNumber ? '🔄 Update and Open' : '💬 Connect WhatsApp'}
                   </button>
                   <button
                     onClick={() => {
@@ -668,7 +667,7 @@ export default function TasksPage() {
                     }}
                     className="px-6 bg-gray-100 text-gray-700 py-3 rounded-xl hover:bg-gray-200 transition-all"
                   >
-                    Cancelar
+                    Cancel
                   </button>
                 </div>
                 {savedWhatsappNumber && (
@@ -679,7 +678,7 @@ export default function TasksPage() {
                     }}
                     className="w-full mt-2 bg-gray-50 text-gray-700 py-2 rounded-xl hover:bg-gray-100 transition-all text-sm"
                   >
-                    Ou apenas abrir WhatsApp com número atual
+                    Or just open WhatsApp with current number
                   </button>
                 )}
               </div>
@@ -692,7 +691,7 @@ export default function TasksPage() {
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                     <span className="text-2xl">🤖</span>
-                    Solicitar para a IA
+                    Request to AI
                   </h3>
                   <button
                     onClick={() => {
@@ -706,16 +705,16 @@ export default function TasksPage() {
                 </div>
 
                 <p className="text-gray-600 mb-4">
-                  Você tem algum pedido específico para a IA gerar a descrição?
+                  Do you have any specific request for the AI to generate the description?
                 </p>
 
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Digite seu pedido:
+                  Enter your request:
                 </label>
                 <textarea
                   value={aiPromptContext}
                   onChange={(e) => setAiPromptContext(e.target.value)}
-                  placeholder="Escreva o passo a passo para uma receita de bolo"
+                  placeholder="Write step by step instructions for a cake recipe"
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-all mb-4 resize-none"
                   rows={4}
                   autoFocus
@@ -723,7 +722,7 @@ export default function TasksPage() {
 
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-4">
                   <p className="text-xs text-blue-700">
-                    <strong>💡 Dica:</strong> Seja específico! Exemplo: "monte o passo a passo detalhado", "adicione estimativa de tempo", "inclua recursos necessários", etc.
+                    <strong>💡 Tip:</strong> Be specific! Example: "create detailed step-by-step", "add time estimate", "include necessary resources", etc.
                   </p>
                 </div>
 
@@ -733,7 +732,7 @@ export default function TasksPage() {
                     disabled={!aiPromptContext.trim()}
                     className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl hover:shadow-lg transition-all font-medium disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed"
                   >
-                    🚀 Gerar com IA
+                    🚀 Generate with AI
                   </button>
                   <button
                     onClick={() => {
@@ -742,7 +741,7 @@ export default function TasksPage() {
                     }}
                     className="px-6 bg-gray-100 text-gray-700 py-3 rounded-xl hover:bg-gray-200 transition-all"
                   >
-                    Cancelar
+                    Cancel
                   </button>
                 </div>
               </div>
@@ -755,7 +754,7 @@ export default function TasksPage() {
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
                     <span>✏️</span>
-                    Editar Tarefa
+                    Edit Task
                   </h3>
                   <button
                     onClick={cancelEdit}
@@ -767,22 +766,22 @@ export default function TasksPage() {
                 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Título</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
                     <input
                       type="text"
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
-                      placeholder="Título da tarefa"
+                      placeholder="Task title"
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Descrição</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
                     <textarea
                       value={editDescription}
                       onChange={(e) => setEditDescription(e.target.value)}
-                      placeholder="Descrição (opcional)"
+                      placeholder="Description (optional)"
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all resize-none"
                       rows={4}
                     />
@@ -791,17 +790,17 @@ export default function TasksPage() {
                       onClick={() => openAIPromptModal(true)}
                       disabled={generatingDescription || !editTitle.trim()}
                       className="mt-3 w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all flex items-center justify-center gap-2 font-medium disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed"
-                      title={!editTitle.trim() ? 'Digite um título primeiro' : 'Gerar descrição com IA'}
+                      title={!editTitle.trim() ? 'Enter a title first' : 'Generate description with AI'}
                     >
                       {generatingDescription ? (
                         <>
                           <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          <span>Gerando com IA...</span>
+                          <span>Generating with AI...</span>
                         </>
                       ) : (
                         <>
                           <span className="text-xl">🤖</span>
-                          <span>Gerar/Melhorar Descrição com IA</span>
+                          <span>Generate/Improve Description with AI</span>
                         </>
                       )}
                     </button>
@@ -809,15 +808,15 @@ export default function TasksPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Prioridade</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
                       <select
                         value={editPriority}
                         onChange={(e) => setEditPriority(e.target.value as 'low' | 'medium' | 'high')}
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all"
                       >
-                        <option value="low">🟢 Baixa</option>
-                        <option value="medium">🟡 Média</option>
-                        <option value="high">🔴 Alta</option>
+                        <option value="low">🟢 Low</option>
+                        <option value="medium">🟡 Medium</option>
+                        <option value="high">🔴 High</option>
                       </select>
                     </div>
 
@@ -827,13 +826,13 @@ export default function TasksPage() {
                         type="text"
                         value={editTags}
                         onChange={(e) => setEditTags(e.target.value)}
-                        placeholder="Tags (separadas por vírgula)"
+                        placeholder="Tags (comma separated)"
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Data de Entrega</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
                       <input
                         type="date"
                         value={editDueDate}
@@ -848,13 +847,13 @@ export default function TasksPage() {
                       onClick={saveEditTask}
                       className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl hover:shadow-lg transition-all font-medium"
                     >
-                      💾 Salvar Alterações
+                      💾 Save Changes
                     </button>
                     <button
                       onClick={cancelEdit}
                       className="px-8 bg-gray-100 text-gray-700 py-3 rounded-xl hover:bg-gray-200 transition-all font-medium"
                     >
-                      Cancelar
+                      Cancel
                     </button>
                   </div>
                 </div>
@@ -865,7 +864,7 @@ export default function TasksPage() {
           {loading ? (
             <div className="text-center py-12 bg-white rounded-2xl shadow-lg">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
-              <p className="text-gray-600 mt-4">Carregando...</p>
+              <p className="text-gray-600 mt-4">Loading...</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -889,7 +888,7 @@ export default function TasksPage() {
                         {task.completed && <span className="text-white text-sm font-bold">✓</span>}
                       </button>
                       <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm ${getPriorityBadge(task.priority)}`}>
-                        {task.priority === 'high' ? '🔴 ALTA' : task.priority === 'medium' ? '🟡 MÉDIA' : '🟢 BAIXA'}
+                        {task.priority === 'high' ? '🔴 HIGH' : task.priority === 'medium' ? '🟡 MEDIUM' : '🟢 LOW'}
                       </span>
                     </div>
 
@@ -935,7 +934,7 @@ export default function TasksPage() {
                           className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-xs hover:bg-blue-200 transition-all font-medium flex items-center gap-1"
                         >
                           <span>✏️</span>
-                          <span>Editar</span>
+                          <span>Edit</span>
                         </button>
                         {deleteConfirm === task.id ? (
                           <div className="flex gap-1">
@@ -943,13 +942,13 @@ export default function TasksPage() {
                               onClick={() => deleteTask(task.id)}
                               className="px-3 py-1.5 bg-red-500 text-white rounded-lg text-xs hover:bg-red-600 font-medium"
                             >
-                              ✓ Confirmar
+                              ✓ Confirm
                             </button>
                             <button
                               onClick={() => setDeleteConfirm(null)}
                               className="px-3 py-1.5 bg-gray-300 text-gray-700 rounded-lg text-xs hover:bg-gray-400 font-medium"
                             >
-                              ✕ Cancelar
+                              ✕ Cancel
                             </button>
                           </div>
                         ) : (
@@ -958,7 +957,7 @@ export default function TasksPage() {
                             className="px-3 py-1.5 bg-red-100 text-red-600 rounded-lg text-xs hover:bg-red-200 transition-all font-medium flex items-center gap-1"
                           >
                             <span>🗑️</span>
-                            <span>Excluir</span>
+                            <span>Delete</span>
                           </button>
                         )}
                         <div className="flex-1"></div>
@@ -968,7 +967,7 @@ export default function TasksPage() {
                             className={`w-8 h-8 rounded-lg text-sm transition-all flex items-center justify-center ${
                               task.priority === 'low' ? 'bg-green-500 text-white shadow-md' : 'bg-gray-100 hover:bg-green-100'
                             }`}
-                            title="Prioridade Baixa"
+                            title="Low Priority"
                           >
                             🟢
                           </button>
@@ -977,7 +976,7 @@ export default function TasksPage() {
                             className={`w-8 h-8 rounded-lg text-sm transition-all flex items-center justify-center ${
                               task.priority === 'medium' ? 'bg-yellow-500 text-white shadow-md' : 'bg-gray-100 hover:bg-yellow-100'
                             }`}
-                            title="Prioridade Média"
+                            title="Medium Priority"
                           >
                             🟡
                           </button>
@@ -986,14 +985,14 @@ export default function TasksPage() {
                             className={`w-8 h-8 rounded-lg text-sm transition-all flex items-center justify-center ${
                               task.priority === 'high' ? 'bg-red-500 text-white shadow-md' : 'bg-gray-100 hover:bg-red-100'
                             }`}
-                            title="Prioridade Alta"
+                            title="High Priority"
                           >
                             🔴
                           </button>
                         </div>
                       </div>
                       <p className="text-xs text-gray-400 mt-2">
-                        Criada em {new Date(task.created_at).toLocaleDateString('pt-BR')}
+                        Created on {new Date(task.created_at).toLocaleDateString('en-US')}
                       </p>
                     </div>
                   </div>
@@ -1003,10 +1002,10 @@ export default function TasksPage() {
                 <div className="col-span-1 lg:col-span-2 text-center py-16 bg-white rounded-2xl shadow-lg">
                   <div className="text-6xl mb-4">📝</div>
                   <p className="text-gray-500 text-lg font-medium mb-2">
-                    {filter === 'pending' ? 'Nenhuma tarefa pendente' : filter === 'completed' ? 'Nenhuma tarefa concluída' : 'Nenhuma tarefa cadastrada'}
+                    {filter === 'pending' ? 'No pending tasks' : filter === 'completed' ? 'No completed tasks' : 'No tasks registered'}
                   </p>
                   <p className="text-gray-400">
-                    {filter === 'all' ? 'Clique em "+ Nova Tarefa" para começar' : 'Tente outro filtro'}
+                    {filter === 'all' ? 'Click "+ New Task" to get started' : 'Try another filter'}
                   </p>
                 </div>
               )}

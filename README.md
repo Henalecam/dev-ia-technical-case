@@ -1,32 +1,32 @@
 # 🚀 TaskFlow AI
 
-Sistema inteligente de gerenciamento de tarefas com IA, integração WhatsApp e interface moderna.
+Intelligent task management system with AI, WhatsApp integration and modern interface.
 
 ---
 
 ## ⚡ Quick Start
 
 ```bash
-# 1. Instalar
+# 1. Install
 npm install
 
-# 2. Configurar .env
+# 2. Configure .env
 cp .env.example .env
 
-# 3. Executar
+# 3. Run
 npm run dev
 ```
 
-Acesse: http://localhost:3000
+Access: http://localhost:3000
 
 ---
 
-## 🗄️ Setup do Banco (Supabase)
+## 🗄️ Database Setup (Supabase)
 
-Execute no SQL Editor do Supabase:
+Execute in Supabase SQL Editor:
 
 ```sql
--- Tabela de Usuários
+-- Users Table
 CREATE TABLE IF NOT EXISTS users (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Tabela de Tasks
+-- Tasks Table
 CREATE TABLE IF NOT EXISTS tasks (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Índices
+-- Indexes
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_whatsapp ON users(whatsapp_number);
 CREATE INDEX idx_tasks_user_id ON tasks(user_id);
@@ -77,39 +77,39 @@ CREATE TRIGGER update_tasks_updated_at
 
 ## 🤖 N8N Workflows
 
-### Configurar Credenciais N8N
+### Configure N8N Credentials
 
 **OpenAI:**
-- Credentials → OpenAI → Adicione sua API Key
+- Credentials → OpenAI → Add your API Key
 
 **Evolution API (WhatsApp):**
 - Credentials → HTTP Header Auth
-- Nome: `apikey`
-- Valor: Sua chave Evolution API
+- Name: `apikey`
+- Value: Your Evolution API key
 
-### URLs dos Webhooks
+### Webhook URLs
 
-Após ativar os workflows, copie as URLs e adicione no `.env`:
+After activating workflows, copy the URLs and add to `.env`:
 
 ```env
-N8N_CHAT_WEBHOOK_URL=https://seu-n8n.app.n8n.cloud/webhook/chat-tasks
-N8N_TASKS_WEBHOOK_URL=https://seu-n8n.app.n8n.cloud/webhook/list-tasks
+N8N_CHAT_WEBHOOK_URL=https://your-n8n.app.n8n.cloud/webhook/chat-tasks
+N8N_TASKS_WEBHOOK_URL=https://your-n8n.app.n8n.cloud/webhook/list-tasks
 ```
 
 ---
 
-## 🌐 Deploy na Vercel
+## 🌐 Deploy on Vercel
 
 ```bash
-# 1. Push para GitHub
+# 1. Push to GitHub
 git add .
 git commit -m "Deploy TaskFlow AI"
 git push
 
-# 2. Conecte à Vercel
-# Vá em vercel.com e importe o repositório
+# 2. Connect to Vercel
+# Go to vercel.com and import the repository
 
-# 3. Configure Environment Variables na Vercel:
+# 3. Configure Environment Variables on Vercel:
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 N8N_CHAT_WEBHOOK_URL=...
@@ -118,32 +118,32 @@ N8N_TASKS_WEBHOOK_URL=...
 
 ---
 
-## ✨ Funcionalidades
+## ✨ Features
 
-### Interface Web
-- ✅ Dashboard com estatísticas
-- ✅ Sistema de prioridades (Alta/Média/Baixa)
-- ✅ Tags e datas de vencimento
-- ✅ Filtros e ordenação
-- ✅ Edição inline
-- ✅ Design moderno e responsivo
+### Web Interface
+- ✅ Dashboard with statistics
+- ✅ Priority system (High/Medium/Low)
+- ✅ Tags and due dates
+- ✅ Filters and sorting
+- ✅ Inline editing
+- ✅ Modern and responsive design
 
-### Chatbot IA (Web - Apenas Consulta)
-- ✅ Consulta e lista suas tasks
-- ✅ Conversa natural sobre tarefas
-- ✅ Dicas de produtividade
-- ✅ GPT-4 com contexto
-- ⚠️ **Não cria/edita tasks** (use a interface)
+### AI Chatbot (Web - Query Only)
+- ✅ Query and list your tasks
+- ✅ Natural conversation about tasks
+- ✅ Productivity tips
+- ✅ GPT-4 with context
+- ⚠️ **Does not create/edit tasks** (use the interface)
 
-### WhatsApp (Fluxo Conversacional)
-- ✅ **Botão WhatsApp** na interface
-- ✅ Solicita e salva número do usuário
-- ✅ Abre conversa com `#todolist` pré-definido
-- ✅ Pede o email do usuário
-- ✅ Valida se o email existe
-- ✅ Mostra tasks pendentes formatadas
-- ✅ Pergunta se deseja ver tasks concluídas
-- ℹ️ Chatbot completo disponível apenas na web
+### WhatsApp (Conversational Flow)
+- ✅ **WhatsApp Button** in interface
+- ✅ Requests and saves user number
+- ✅ Opens chat with `#todolist` pre-defined
+- ✅ Asks for user's email
+- ✅ Validates if email exists
+- ✅ Shows formatted pending tasks
+- ✅ Asks if user wants to see completed tasks
+- ℹ️ Full chatbot available only on web
 
 ---
 
@@ -166,20 +166,20 @@ POST   /api/whatsapp/webhook
 
 ---
 
-## 🔐 Variáveis de Ambiente
+## 🔐 Environment Variables
 
-Veja `.env.example` para referência completa.
+See `.env.example` for complete reference.
 
-**Obrigatórias:**
-- `NEXT_PUBLIC_SUPABASE_URL` - URL do Supabase
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Chave anônima do Supabase
-- `N8N_CHAT_WEBHOOK_URL` - Webhook do chatbot (apenas web)
+**Required:**
+- `NEXT_PUBLIC_SUPABASE_URL` - Supabase URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
+- `N8N_CHAT_WEBHOOK_URL` - Chatbot webhook (web only)
 
-**Opcionais (WhatsApp - Comando #):**
-- `N8N_TASKS_WEBHOOK_URL` - Webhook para listar tasks
-- `EVOLUTION_API_URL` - URL da Evolution API
-- `EVOLUTION_API_KEY` - Chave da Evolution API
-- `EVOLUTION_INSTANCE_NAME` - Nome da instância
+**Optional (WhatsApp - Command #):**
+- `N8N_TASKS_WEBHOOK_URL` - Webhook to list tasks
+- `EVOLUTION_API_URL` - Evolution API URL
+- `EVOLUTION_API_KEY` - Evolution API key
+- `EVOLUTION_INSTANCE_NAME` - Instance name
 
 ---
 
@@ -187,42 +187,42 @@ Veja `.env.example` para referência completa.
 
 - **Frontend:** Next.js 14, React, TypeScript, TailwindCSS
 - **Backend:** Next.js API Routes, Supabase
-- **IA:** N8N + OpenAI GPT-4
+- **AI:** N8N + OpenAI GPT-4
 - **WhatsApp:** Evolution API
 
 ---
 
-## 📞 Suporte
+## 📞 Support
 
 - Issues: Use GitHub Issues
 
 ---
 
-**TaskFlow AI** - Desenvolvido com ❤️
+**TaskFlow AI** - Developed with ❤️
 
 ---
 
-## 💬 Botão WhatsApp
+## 💬 WhatsApp Button
 
-### Funcionalidade
+### Functionality
 
-O botão **💬 WhatsApp** na interface permite:
-1. Salvar seu número de WhatsApp
-2. Abrir conversa direta com o bot
-3. Mensagem `#todolist` já vem pré-digitada
+The **💬 WhatsApp** button in the interface allows you to:
+1. Save your WhatsApp number
+2. Open direct conversation with the bot
+3. Message `#todolist` comes pre-typed
 
-### Primeiro Uso
+### First Use
 
-1. Clique no botão **💬 WhatsApp**
-2. Digite seu número: `(41) 99999-9999`
-3. Clique em **Conectar WhatsApp**
-4. Será redirecionado automaticamente
-5. Envie a mensagem `#todolist` que já está pré-digitada
+1. Click the **💬 WhatsApp** button
+2. Enter your number: `(41) 99999-9999`
+3. Click **Connect WhatsApp**
+4. You will be redirected automatically
+5. Send the `#todolist` message that's already pre-typed
 
-### Próximos Usos
+### Next Uses
 
-- O número fica salvo
-- Clique no botão e vai direto para o WhatsApp
-- Sem precisar digitar novamente
+- Number is saved
+- Click the button and go straight to WhatsApp
+- No need to type again
 
 ---

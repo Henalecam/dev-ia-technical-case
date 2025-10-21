@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 
   if (!finalUserId) {
     return NextResponse.json(
-      { error: 'user_key ou user_id é obrigatório' },
+      { error: 'user_key or user_id is required' },
       { status: 400 }
     )
   }
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
 
   if (!title) {
     return NextResponse.json(
-      { error: 'title é obrigatório' },
+      { error: 'title is required' },
       { status: 400 }
     )
   }
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
 
   if (!finalUserId) {
     return NextResponse.json(
-      { error: 'user_key ou user_id é obrigatório' },
+      { error: 'user_key or user_id is required' },
       { status: 400 }
     )
   }
@@ -137,7 +137,7 @@ export async function PUT(request: NextRequest) {
 
   if (!id) {
     return NextResponse.json(
-      { error: 'id é obrigatório' },
+      { error: 'id is required' },
       { status: 400 }
     )
   }
@@ -170,7 +170,7 @@ export async function DELETE(request: NextRequest) {
 
   if (!id) {
     return NextResponse.json(
-      { error: 'id é obrigatório' },
+      { error: 'id is required' },
       { status: 400 }
     )
   }

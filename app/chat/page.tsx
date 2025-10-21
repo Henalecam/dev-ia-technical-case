@@ -32,7 +32,7 @@ export default function ChatPage() {
       } else {
         const welcomeMessage: Message = {
           role: 'assistant',
-          content: 'Olá! 👋 Sou seu assistente de consulta de tarefas.\n\nPosso ajudá-lo a:\n• 📋 Consultar suas tarefas\n• 🔍 Filtrar por prioridade\n• 📊 Ver estatísticas\n• 💡 Dar dicas de organização\n• ⏰ Lembrar sobre prazos\n\n⚠️ Para criar ou editar tarefas, use a interface principal.\n\nComo posso ajudar você hoje?',
+          content: 'Hello! 👋 I am your task query assistant.\n\nI can help you:\n• 📋 Query your tasks\n• 🔍 Filter by priority\n• 📊 View statistics\n• 💡 Give organization tips\n• ⏰ Remind about deadlines\n\n⚠️ To create or edit tasks, use the main interface.\n\nHow can I help you today?',
           timestamp: new Date().toISOString(),
         }
         setMessages([welcomeMessage])
@@ -49,7 +49,7 @@ export default function ChatPage() {
         setSavedWhatsappNumber(null)
       }
     } catch (error) {
-      console.error('Erro ao carregar número WhatsApp:', error)
+      console.error('Error loading WhatsApp number:', error)
       setSavedWhatsappNumber(null)
     }
   }
@@ -85,7 +85,7 @@ export default function ChatPage() {
       } else {
         const welcomeMessage: Message = {
           role: 'assistant',
-          content: 'Olá! 👋 Sou seu assistente de consulta de tarefas.\n\nPosso ajudá-lo a:\n• 📋 Consultar suas tarefas\n• 🔍 Filtrar por prioridade\n• 📊 Ver estatísticas\n• 💡 Dar dicas de organização\n• ⏰ Lembrar sobre prazos\n\n⚠️ Para criar ou editar tarefas, use a interface principal.\n\nComo posso ajudar você hoje?',
+          content: 'Hello! 👋 I am your task query assistant.\n\nI can help you:\n• 📋 Query your tasks\n• 🔍 Filter by priority\n• 📊 View statistics\n• 💡 Give organization tips\n• ⏰ Remind about deadlines\n\n⚠️ To create or edit tasks, use the main interface.\n\nHow can I help you today?',
           timestamp: new Date().toISOString(),
         }
         setMessages([welcomeMessage])
@@ -109,7 +109,7 @@ export default function ChatPage() {
       timestamp: new Date().toISOString(),
     }
 
-    // Adiciona mensagem do usuário imediatamente
+
     const updatedMessages = [...messages, userMessage]
     setMessages(updatedMessages)
     setInputMessage('')
@@ -123,7 +123,7 @@ export default function ChatPage() {
 
       const assistantMessage: Message = {
         role: 'assistant',
-        content: response.data.reply || 'Resposta recebida',
+        content: response.data.reply || 'Response received',
         timestamp: new Date().toISOString(),
       }
 
@@ -131,7 +131,7 @@ export default function ChatPage() {
     } catch (error: any) {
       const errorMessage: Message = {
         role: 'assistant',
-        content: `❌ Erro ao processar mensagem: ${error.response?.data?.error || error.message}.\n\n💡 Verifique se o N8N está configurado corretamente.`,
+        content: `❌ Error processing message: ${error.response?.data?.error || error.message}.\n\n💡 Check if N8N is configured correctly.`,
         timestamp: new Date().toISOString(),
       }
       setMessages([...updatedMessages, errorMessage])
@@ -143,7 +143,7 @@ export default function ChatPage() {
   const clearChat = () => {
     const welcomeMessage: Message = {
       role: 'assistant',
-      content: 'Olá! 👋 Sou seu assistente de tarefas inteligente.\n\nPosso ajudá-lo a:\n• 📋 Consultar suas tarefas\n• ✨ Criar novas tarefas\n• 📝 Melhorar descrições\n• 🎯 Organizar prioridades\n• 💡 Dar sugestões\n\nComo posso ajudar você hoje?',
+      content: 'Hello! 👋 I am your intelligent task assistant.\n\nI can help you:\n• 📋 Query your tasks\n• ✨ Create new tasks\n• 📝 Improve descriptions\n• 🎯 Organize priorities\n• 💡 Give suggestions\n\nHow can I help you today?',
       timestamp: new Date().toISOString(),
     }
     setMessages([welcomeMessage])
@@ -151,10 +151,10 @@ export default function ChatPage() {
   }
 
   const quickActions = [
-    { label: 'Minhas tarefas pendentes', icon: '📋', description: 'Ver todas as tarefas não concluídas' },
-    { label: 'Tarefas de alta prioridade', icon: '🔴', description: 'Tarefas urgentes que precisam de atenção' },
-    { label: 'Tarefas para hoje', icon: '📅', description: 'Tarefas com prazo para hoje' },
-    { label: 'Resumo das minhas tarefas', icon: '📊', description: 'Estatísticas e análise geral' },
+    { label: 'My pending tasks', icon: '📋', description: 'View all uncompleted tasks' },
+    { label: 'High priority tasks', icon: '🔴', description: 'Urgent tasks that need attention' },
+    { label: 'Tasks for today', icon: '📅', description: 'Tasks due today' },
+    { label: 'My tasks summary', icon: '📊', description: 'Statistics and general analysis' },
   ]
 
   const handleQuickAction = (label: string) => {
@@ -173,7 +173,7 @@ export default function ChatPage() {
               Chatbot AI
             </h1>
             <p className="text-gray-600">
-              Seu assistente inteligente de tarefas
+              Your intelligent task assistant
             </p>
           </div>
           <div className="space-y-4">
@@ -182,20 +182,20 @@ export default function ChatPage() {
               value={userKey}
               onChange={(e) => setUserKey(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-              placeholder="Digite seu nome ou e-mail"
+              placeholder="Enter your name or email"
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
             />
             <button
               onClick={handleLogin}
               className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
-              Acessar Chatbot
+              Access Chatbot
             </button>
           </div>
           <div className="mt-6 text-center">
             <a href="/" className="text-indigo-600 hover:text-indigo-700 font-medium flex items-center justify-center gap-2">
               <span>←</span>
-              Voltar para Tarefas
+              Back to Tasks
             </a>
           </div>
         </div>
@@ -223,7 +223,7 @@ export default function ChatPage() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  Assistente AI
+                  AI Assistant
                 </h1>
                 <p className="text-gray-600 text-sm flex items-center gap-2">
                   <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
@@ -237,7 +237,7 @@ export default function ChatPage() {
                 className="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-xl hover:bg-yellow-200 transition-all text-sm font-medium border border-yellow-300 flex items-center gap-2"
               >
                 <span>🗑️</span>
-                Limpar Chat
+                Clear Chat
               </button>
             </div>
           </div>
@@ -250,9 +250,9 @@ export default function ChatPage() {
               <div className="w-24 h-24 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <span className="text-5xl">💬</span>
               </div>
-              <p className="text-gray-500 text-lg font-medium mb-2">Comece uma conversa</p>
+              <p className="text-gray-500 text-lg font-medium mb-2">Start a conversation</p>
               <p className="text-gray-400 text-sm">
-                Digite uma mensagem ou use uma ação rápida abaixo
+                Type a message or use a quick action below
               </p>
             </div>
           )}
@@ -322,7 +322,7 @@ export default function ChatPage() {
                       <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
                       <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                     </div>
-                    <span className="text-sm text-gray-600 font-medium">IA está pensando...</span>
+                    <span className="text-sm text-gray-600 font-medium">AI is thinking...</span>
                   </div>
                 </div>
               </div>
@@ -337,7 +337,7 @@ export default function ChatPage() {
           <div className="bg-white shadow-xl px-6 py-4 border-t border-gray-200">
             <p className="text-sm text-gray-600 mb-4 font-medium flex items-center gap-2">
               <span>⚡</span>
-              Ações Rápidas
+              Quick Actions
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {quickActions.map((action, idx) => (
@@ -366,7 +366,7 @@ export default function ChatPage() {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !loading && sendMessage()}
-                placeholder={loading ? "Aguarde a resposta da IA..." : "Digite sua mensagem ou pergunta..."}
+                placeholder={loading ? "Wait for the AI response..." : "Type your message or question..."}
                 disabled={loading}
                 className="w-full px-6 py-4 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
@@ -382,11 +382,11 @@ export default function ChatPage() {
               {loading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span className="hidden sm:inline">Pensando...</span>
+                  <span className="hidden sm:inline">Thinking...</span>
                 </>
               ) : (
                 <>
-                  <span>Enviar</span>
+                  <span>Send</span>
                   <span className="text-lg">🚀</span>
                 </>
               )}
@@ -396,19 +396,19 @@ export default function ChatPage() {
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1">
                 <span>💡</span>
-                <span>Dica: Use ações rápidas para começar</span>
+                <span>Tip: Use quick actions to get started</span>
               </span>
             </div>
             <div className="flex items-center gap-2">
               {loading ? (
                 <span className="flex items-center gap-2 text-indigo-600">
                   <div className="w-3 h-3 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
-                  <span>IA processando...</span>
+                  <span>AI processing...</span>
                 </span>
               ) : (
                 <span className="text-green-600 flex items-center gap-1">
                   <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                  <span>Pronto para conversar</span>
+                  <span>Ready to chat</span>
                 </span>
               )}
             </div>

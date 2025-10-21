@@ -15,8 +15,8 @@ export default function Navbar({ userKey, onLogout, currentPage = 'tasks', onWha
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const navItems = [
-    { href: '/tasks', label: 'Tarefas', icon: '📋', page: 'tasks' as const },
-    { href: '/chat', label: 'Chat IA', icon: '🤖', page: 'chat' as const },
+    { href: '/tasks', label: 'Tasks', icon: '📋', page: 'tasks' as const },
+    { href: '/chat', label: 'AI Chat', icon: '🤖', page: 'chat' as const },
   ]
 
   return (
@@ -33,7 +33,7 @@ export default function Navbar({ userKey, onLogout, currentPage = 'tasks', onWha
                 <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                   TaskFlow AI
                 </h1>
-                <p className="text-xs text-gray-500">Sistema Inteligente</p>
+                <p className="text-xs text-gray-500">Smart System</p>
               </div>
             </Link>
           </div>
@@ -60,10 +60,10 @@ export default function Navbar({ userKey, onLogout, currentPage = 'tasks', onWha
               <button
                 onClick={onWhatsAppClick}
                 className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:shadow-lg transition-all flex items-center space-x-2"
-                title={hasWhatsAppNumber ? 'Abrir WhatsApp' : 'Conectar WhatsApp'}
+                title={hasWhatsAppNumber ? 'Open WhatsApp' : 'Connect WhatsApp'}
               >
                 <span className="text-lg">💬</span>
-                <span>{hasWhatsAppNumber ? 'WhatsApp' : 'Conectar'}</span>
+                <span>{hasWhatsAppNumber ? 'WhatsApp' : 'Connect'}</span>
               </button>
             )}
 
@@ -71,13 +71,13 @@ export default function Navbar({ userKey, onLogout, currentPage = 'tasks', onWha
             <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-gray-200">
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-900">{userKey}</p>
-                <p className="text-xs text-gray-500">Usuário ativo</p>
+                <p className="text-xs text-gray-500">Active user</p>
               </div>
               <button
                 onClick={onLogout}
                 className="px-3 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all text-sm font-medium"
               >
-                Sair
+                Logout
               </button>
             </div>
           </div>
@@ -124,14 +124,14 @@ export default function Navbar({ userKey, onLogout, currentPage = 'tasks', onWha
                   className="w-full px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:shadow-lg transition-all flex items-center space-x-3"
                 >
                   <span className="text-lg">💬</span>
-                  <span>{hasWhatsAppNumber ? 'WhatsApp' : 'Conectar'}</span>
+                  <span>{hasWhatsAppNumber ? 'WhatsApp' : 'Connect'}</span>
                 </button>
               )}
 
               <div className="pt-4 border-t border-gray-200">
                 <div className="px-4 py-2">
                   <p className="text-sm font-medium text-gray-900">{userKey}</p>
-                  <p className="text-xs text-gray-500">Usuário ativo</p>
+                  <p className="text-xs text-gray-500">Active user</p>
                 </div>
                 <button
                   onClick={() => {
@@ -140,7 +140,7 @@ export default function Navbar({ userKey, onLogout, currentPage = 'tasks', onWha
                   }}
                   className="w-full mt-2 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all text-sm font-medium"
                 >
-                  Sair
+                  Logout
                 </button>
               </div>
             </div>

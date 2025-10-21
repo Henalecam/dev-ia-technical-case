@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
     if (!title) {
       return NextResponse.json(
-        { error: 'Título é obrigatório' },
+        { error: 'Title is required' },
         { status: 400 }
       )
     }
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     if (!n8nUrl) {
       return NextResponse.json(
-        { error: 'N8N_CHAT_WEBHOOK_URL não configurada' },
+        { error: 'N8N_CHAT_WEBHOOK_URL not configured' },
         { status: 500 }
       )
     }
@@ -48,9 +48,9 @@ export async function POST(request: NextRequest) {
       // Se vier como objeto, tenta extrair o output ou description
       generatedDescription = response.data.output || response.data.description || JSON.stringify(response.data);
     } else {
-      console.error('Formato de resposta inesperado do N8N:', response.data);
+      console.error('Unexpected response format from N8N:', response.data);
       return NextResponse.json(
-        { error: 'Formato de resposta inesperado do N8N.' },
+        { error: 'Unexpected response format from N8N.' },
         { status: 500 }
       );
     }
@@ -70,12 +70,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ description: formattedDescription })
 
   } catch (error: any) {
-    console.error('Erro ao chamar N8N:', error)
-    console.error('Erro response:', error.response?.data)
+    console.error('Error calling N8N:', error)
+    console.error('Error response:', error.response?.data)
     
     return NextResponse.json(
       { 
-        error: 'Erro ao gerar descrição',
+        error: 'Error generating description',
         details: error.response?.data || error.message 
       },
       { status: error.response?.status || 500 }
