@@ -29,9 +29,6 @@ export default function TasksPage() {
   const [editPriority, setEditPriority] = useState<'low' | 'medium' | 'high'>('medium')
   const [editTags, setEditTags] = useState('')
   const [editDueDate, setEditDueDate] = useState('')
-  const [showAIPromptModal, setShowAIPromptModal] = useState(false)
-  const [aiPromptContext, setAiPromptContext] = useState('')
-  const [isEditingContext, setIsEditingContext] = useState(false)
 
   useEffect(() => {
     const savedUserKey = localStorage.getItem('userKey')
@@ -160,24 +157,15 @@ export default function TasksPage() {
     return temp.textContent || temp.innerText || ''
   }
 
-  const openAIPromptModal = (isEditing: boolean = false) => {
+  const generateDescription = async (isEditing: boolean = false) => {
     const title = isEditing ? editTitle : newTaskTitle
+    const currentDescription = isEditing ? editDescription : newTaskDescription
     
     if (!title.trim()) {
       alert('Enter a title for the task before generating the description')
       return
     }
 
-    setIsEditingContext(isEditing)
-    setAiPromptContext('')
-    setShowAIPromptModal(true)
-  }
-
-  const generateDescription = async () => {
-    const title = isEditingContext ? editTitle : newTaskTitle
-    const currentDescription = isEditingContext ? editDescription : newTaskDescription
-
-    setShowAIPromptModal(false)
     setGeneratingDescription(true)
     
     try {
@@ -185,7 +173,7 @@ export default function TasksPage() {
         title: title,
         description: currentDescription,
         user_key: userKey,
-        additional_context: aiPromptContext,
+        additional_context: '',
       }, {
         headers: {
           'Content-Type': 'application/json',
@@ -196,13 +184,13 @@ export default function TasksPage() {
       if (response.data && response.data.description) {
         const plainTextDescription = htmlToText(response.data.description)
         
-        if (isEditingContext) {
+        if (isEditing) {
           setEditDescription(plainTextDescription)
         } else {
           setNewTaskDescription(plainTextDescription)
         }
       } else if (typeof response.data === 'string') {
-        if (isEditingContext) {
+        if (isEditing) {
           setEditDescription(response.data)
         } else {
           setNewTaskDescription(response.data)
@@ -497,7 +485,7 @@ export default function TasksPage() {
                   />
                   <button
                     type="button"
-                    onClick={() => openAIPromptModal(false)}
+                    onClick={() => generateDescription(false)}
                     disabled={generatingDescription || !newTaskTitle.trim()}
                     className="mt-3 w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all flex items-center justify-center gap-2 font-medium disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed"
                     title={!newTaskTitle.trim() ? 'Enter a title first' : 'Generate description with AI'}
@@ -685,69 +673,6 @@ export default function TasksPage() {
             </div>
           )}
 
-          {showAIPromptModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-              <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    <span className="text-2xl">🤖</span>
-                    Request to AI
-                  </h3>
-                  <button
-                    onClick={() => {
-                      setShowAIPromptModal(false)
-                      setAiPromptContext('')
-                    }}
-                    className="text-gray-400 hover:text-gray-600 text-2xl"
-                  >
-                    ×
-                  </button>
-                </div>
-
-                <p className="text-gray-600 mb-4">
-                  Do you have any specific request for the AI to generate the description?
-                </p>
-
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Enter your request:
-                </label>
-                <textarea
-                  value={aiPromptContext}
-                  onChange={(e) => setAiPromptContext(e.target.value)}
-                  placeholder="Write step by step instructions for a cake recipe"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-all mb-4 resize-none"
-                  rows={4}
-                  autoFocus
-                />
-
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-4">
-                  <p className="text-xs text-blue-700">
-                    <strong>💡 Tip:</strong> Be specific! Example: "create detailed step-by-step", "add time estimate", "include necessary resources", etc.
-                  </p>
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={generateDescription}
-                    disabled={!aiPromptContext.trim()}
-                    className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl hover:shadow-lg transition-all font-medium disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed"
-                  >
-                    🚀 Generate with AI
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowAIPromptModal(false)
-                      setAiPromptContext('')
-                    }}
-                    className="px-6 bg-gray-100 text-gray-700 py-3 rounded-xl hover:bg-gray-200 transition-all"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
           {editingTask && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
               <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
@@ -787,7 +712,7 @@ export default function TasksPage() {
                     />
                     <button
                       type="button"
-                      onClick={() => openAIPromptModal(true)}
+                      onClick={() => generateDescription(true)}
                       disabled={generatingDescription || !editTitle.trim()}
                       className="mt-3 w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all flex items-center justify-center gap-2 font-medium disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed"
                       title={!editTitle.trim() ? 'Enter a title first' : 'Generate description with AI'}
